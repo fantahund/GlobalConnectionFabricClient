@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "globalconnectionfabricclient",
+  "version": "${version}",
+  "name": "GlobalConnectionFabricClient",
+  "description": "Connect Client with Servers",
+  "authors": [
+    "Brokkonaut",
+    "fanta"
+  ],
+  "contact": {
+    "website": "https://cubeside.de",
+    "repo": "https://github.com/fantahund/GlobalConnectionFabricClient"
+  },
+  "license": "MIT",
+  "icon": "assets/globalconnectionfabricclient/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "de.cubeside.connection.GlobalConnectionFabricClient"
+    ]
+  },
+  "mixins": [
+    "globalconnectionfabricclient.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
