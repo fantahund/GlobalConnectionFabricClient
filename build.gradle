@@ -34,7 +34,7 @@ dependencies {
     modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
-    shade 'de.cubeside:globalconnectionclient:0.0.1-SNAPSHOT'
+    implementation 'de.cubeside:globalconnectionclient:0.0.1-SNAPSHOT'
 }
 
 processResources {
