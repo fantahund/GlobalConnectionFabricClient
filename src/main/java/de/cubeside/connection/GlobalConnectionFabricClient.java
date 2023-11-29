@@ -27,15 +27,24 @@ public class GlobalConnectionFabricClient implements ClientModInitializer {
 
     private static GlobalConnectionFabricClient instance;
 
+    private File configFile;
+    private Gson gson;
+
     public GlobalConnectionFabricClient() {
         instance = this;
     }
 
     @Override
     public void onInitializeClient() {
+        initConfig();
+        ClientLifecycleEvents.CLIENT_STARTED.register(this::onServerStarting);
+        ClientLifecycleEvents.CLIENT_STOPPING.register(this::onServerStopping);
+    }
+
+    private void initConfig() {
         FabricLoader.getInstance().getConfigDir().toFile().mkdirs();
-        File configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), "globalclient.json");
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), "globalclient.json");
+        gson = new GsonBuilder().setPrettyPrinting().create();
         if (configFile.exists()) {
             try (FileReader reader = new FileReader(configFile, StandardCharsets.UTF_8)) {
                 config = gson.fromJson(reader, GlobalClientConfig.class);
@@ -52,15 +61,16 @@ public class GlobalConnectionFabricClient implements ClientModInitializer {
             saveConfig = true;
         }
         if (saveConfig) {
-            try (FileWriter writer = new FileWriter(configFile, StandardCharsets.UTF_8)) {
-                gson.toJson(config, writer);
-            } catch (Exception e) {
-                LOGGER.error("Could not save GlobalClient config", e);
-            }
+            saveConfig();
         }
+    }
 
-        ClientLifecycleEvents.CLIENT_STARTED.register(this::onServerStarting);
-        ClientLifecycleEvents.CLIENT_STOPPING.register(this::onServerStopping);
+    private void saveConfig() {
+        try (FileWriter writer = new FileWriter(configFile, StandardCharsets.UTF_8)) {
+            gson.toJson(config, writer);
+        } catch (Exception e) {
+            LOGGER.error("Could not save GlobalClient config", e);
+        }
     }
     public void onServerStarting(MinecraftClient client) {
         globalClient = new GlobalClientFabric(this, client);
@@ -68,6 +78,16 @@ public class GlobalConnectionFabricClient implements ClientModInitializer {
 
         messageAPI = new PlayerMessageImplementation(this, client);
         propertiesAPI = new PlayerPropertiesImplementation(this, client);
+    }
+
+    public void loginClientAndWriteConfig(String hostname, int port, String user, String passwort) {
+        config.setHostname(hostname);
+        config.setPort(port);
+        config.setUser(user);
+        config.setPassword(passwort);
+        saveConfig();
+        onServerStopping(MinecraftClient.getInstance());
+        onServerStarting(MinecraftClient.getInstance());
     }
 
     public void onServerStopping(MinecraftClient client) {
