@@ -22,7 +22,7 @@ public class GlobalClientFabric extends GlobalClient {
     protected boolean running = true;
     private MinecraftClient minecraftClient;
 
-    private static ConnectionAPI instance;
+    private static GlobalClientFabric instance;
 
     public GlobalClientFabric(GlobalConnectionFabricClient connectionPlugin, MinecraftClient minecraftClient) {
         super(null);
@@ -115,7 +115,7 @@ public class GlobalClientFabric extends GlobalClient {
         }
     }
 
-    public static ConnectionAPI getInstance() {
+    public static GlobalClientFabric getInstance() {
         return instance;
     }
 }
